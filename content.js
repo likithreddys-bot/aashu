@@ -13,17 +13,17 @@ window.CONTENT = {
     title: "Line Without a Hook"
   },
   art: {
-    hero: "assets/anime/hero.jpg",
+    hero: "assets/anime/hero.jpg",          // fallback for any missing image
+    bg: "assets/anime/bg-hd.webp",          // hero sky (no princess)
+    princess: "assets/anime/princess.webp", // cut-out princess layer
+    toys: [1, 2, 3, 4, 5].map(i => `assets/anime/toy-${i}.webp`),
     couple: "assets/anime/couple.jpg",
     palace: "assets/anime/palace.jpg",
     ballroom: "assets/anime/ballroom.jpg"
   },
 
-  hero: {
-    kicker: "A winter tale for",
-    title: "Princess Aashu",
-    line: "Happy Birthday to the bravest, silliest, most beautiful girl in every kingdom."
-  },
+  hero: { kicker: "Happy Birthday, Princess" },
+  banner: "HAPPY BIRTHDAY",                 // letters on the flags the toys are holding
 
   prologue: [
     "Once upon a time, in December 2024,",
@@ -80,7 +80,6 @@ window.CONTENT = {
   ],
 
   finale: {
-    wish: "Make a wish, Princess",
     title: "Happy Birthday, Aashu",
     surprise: "And your real surprise is waiting for you. Look up. 💙"
   }

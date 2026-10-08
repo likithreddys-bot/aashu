@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#070b1f">
 <title>For Princess Aashu</title>
-<link rel="preload" href="assets/anime/hero.jpg" as="image">
+<link rel="preload" href="fonts/great-vibes-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/frozen.css">
 </head>
 <body class="locked">
@@ -32,16 +32,19 @@
 
 <main id="story">
 
-  <!-- Hero -->
+  <!-- Hero: layered, animated scene -->
   <section class="hero" id="hero">
-    <div class="hero-art"><img id="heroImg" alt=""></div>
+    <div class="layer l-bg" data-depth="10"><img id="bgImg" alt=""></div>
+    <div class="sheen" aria-hidden="true"></div>
+    <div class="twinkle" id="twinkle" aria-hidden="true"></div>
+    <div class="layer l-princess" data-depth="22"><img id="princessImg" alt=""></div>
     <div class="hero-shade"></div>
-    <div class="hero-text">
+    <div class="hero-title">
       <p class="kicker" id="heroKicker"></p>
-      <h2 class="shimmer" id="heroTitle"></h2>
-      <p class="hero-line" id="heroLine"></p>
+      <h1 class="script grad" id="heroName"></h1>
     </div>
-    <div class="scrollhint"><span>Scroll</span><i></i></div>
+    <div class="scrollhint"><span>Scroll ↓</span></div>
+    <div class="toys" id="heroToys" data-depth="34"><svg class="bunting" aria-hidden="true"><path id="sticks" class="sticks"/><path id="rope"/></svg><div id="flags"></div></div>
   </section>
 
   <!-- Prologue over the ice palace -->
@@ -111,17 +114,11 @@
     <div class="sticky">
       <div class="bg"><img id="ballroomImg" alt=""></div>
       <div class="bg-shade light"></div>
-      <div class="candle-glow" id="glow" aria-hidden="true"></div>
       <div class="finale-ui">
-        <h2 class="shimmer" id="wish"></h2>
-        <div class="finale-bottom">
-          <p class="hint" id="blowHint">Blow into your phone to blow out the candles</p>
-          <button class="btn" id="blowBtn">Blow 🎤</button>
-          <button class="link" id="tapBlow">or just tap here</button>
-          <h2 class="shimmer big" id="finalTitle" hidden></h2>
-          <p class="surprise" id="surprise" hidden></p>
-        </div>
+        <h2 class="grad" id="finalTitle"></h2>
+        <p class="surprise" id="surprise"></p>
       </div>
+      <div class="toys" id="finaleToys"></div>
     </div>
   </section>
 </main>

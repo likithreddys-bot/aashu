@@ -6,64 +6,45 @@ const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAl
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const rand = (a, b) => a + Math.random() * (b - a);
 const DPR = Math.min(devicePixelRatio || 1, 2);
+const loadImg = src => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
 
-/* ---------- art (falls back to the hero if a file is missing) ---------- */
-function setArt(img, src) {
-  img.onerror = () => { img.onerror = null; img.src = C.art.hero; };
-  img.src = src;
-}
-setArt($("#heroImg"), C.art.hero);
-setArt($("#palaceImg"), C.art.palace);
-setArt($("#coupleImg"), C.art.couple);
-setArt($("#ballroomImg"), C.art.ballroom);
-
-/* ---------- snow (3 depth layers) ---------- */
-const sc = $("#snow"), sx = sc.getContext("2d");
-let flakes = [];
-function sizeCanvas(c) { c.width = innerWidth * DPR; c.height = innerHeight * DPR; }
+/* =========================================================
+   AMBIENT: snow + sparkle/firework fx
+   ========================================================= */
+const sc = $("#snow"), sx = sc.getContext("2d"); let flakes = [], boost = 0, wind = 0;
+const size = c => { c.width = innerWidth * DPR; c.height = innerHeight * DPR; };
 function seedSnow() {
-  sizeCanvas(sc);
-  const n = Math.round(Math.min(220, innerWidth * innerHeight / 5200));
-  flakes = Array.from({ length: n }, () => {
-    const z = Math.random();
-    return { x: Math.random() * sc.width, y: Math.random() * sc.height, r: (.6 + z * 2.4) * DPR, v: (.25 + z * 1.1) * DPR, w: rand(0, 6.28), a: .35 + z * .6 };
-  });
+  size(sc);
+  const n = Math.round(Math.min(200, innerWidth * innerHeight / 5600));
+  flakes = Array.from({ length: n }, () => { const z = Math.random(); return { x: Math.random() * sc.width, y: Math.random() * sc.height, r: (.6 + z * 2.3) * DPR, v: (.25 + z * 1.05) * DPR, w: rand(0, 6.28), a: .3 + z * .6 }; });
 }
-let wind = 0, boost = 0;
-function snowLoop(t) {
-  sx.clearRect(0, 0, sc.width, sc.height);
-  wind += (Math.sin(t / 4000) * .6 - wind) * .01;
+(function snow(t) {
+  sx.clearRect(0, 0, sc.width, sc.height); wind += (Math.sin(t / 4000) * .6 - wind) * .01; sx.fillStyle = "#fff";
   for (const f of flakes) {
-    f.y += f.v * (1 + boost); f.x += (Math.sin(t / 1200 + f.w) * .4 + wind) * DPR * (1 + boost * .5);
+    f.y += f.v * (1 + boost); f.x += (Math.sin(t / 1200 + f.w) * .4 + wind) * DPR;
     if (f.y > sc.height + 5) { f.y = -5; f.x = Math.random() * sc.width; }
     if (f.x > sc.width + 5) f.x = -5; if (f.x < -5) f.x = sc.width + 5;
-    sx.globalAlpha = f.a; sx.beginPath(); sx.arc(f.x, f.y, f.r, 0, 6.283); sx.fillStyle = "#fff"; sx.fill();
+    sx.globalAlpha = f.a; sx.beginPath(); sx.arc(f.x, f.y, f.r, 0, 6.283); sx.fill();
   }
-  boost *= .97;
-  requestAnimationFrame(snowLoop);
-}
-addEventListener("resize", seedSnow); seedSnow(); requestAnimationFrame(snowLoop);
+  boost *= .97; requestAnimationFrame(snow);
+})(0);
+addEventListener("resize", seedSnow); seedSnow();
 
-/* ---------- fx: sparkles + fireworks ---------- */
 const fc = $("#fx"), fx = fc.getContext("2d"); let sparks = [], fxRaf = 0;
-addEventListener("resize", () => sizeCanvas(fc)); sizeCanvas(fc);
-const ICE = ["#ffffff", "#bfe8ff", "#7fdcff", "#9b7bff", "#4ef0d0"], GOLD = ["#fff3c4", "#ffd98a", "#ffb047", "#ffffff"];
-function burst(x, y, n = 40, cols = ICE, power = 7, star = true) {
+addEventListener("resize", () => size(fc)); size(fc);
+const ICE = ["#ffffff", "#bfe8ff", "#7fdcff", "#a98bff", "#5ff3d6"], GOLD = ["#fff3c4", "#ffd98a", "#ffb047", "#ffffff"], PARTY = ["#ff8fc4", "#7fdcff", "#ffd98a", "#a98bff", "#5ff3d6", "#ffffff"];
+function burst(x, y, n = 40, cols = ICE, power = 7, star = true, grav = .06) {
   for (let i = 0; i < n; i++) {
-    const a = Math.random() * 6.283, s = rand(.3, 1) * power * DPR;
-    sparks.push({ x: x * DPR, y: y * DPR, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rand(.7, 1.3), c: cols[i % cols.length], r: rand(1, 2.6) * DPR, star: star && Math.random() < .35 });
+    const a = Math.random() * 6.283, s = rand(.25, 1) * power * DPR;
+    sparks.push({ x: x * DPR, y: y * DPR, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rand(.7, 1.3), c: cols[i % cols.length], r: rand(1, 2.6) * DPR, star: star && Math.random() < .4, g: grav });
   }
   if (!fxRaf) fxRaf = requestAnimationFrame(fxLoop);
 }
-function firework() {
-  const x = rand(.15, .85) * innerWidth, y = rand(.12, .45) * innerHeight;
-  burst(x, y, 90, Math.random() < .5 ? ICE : GOLD, 9, false);
-}
+const firework = () => burst(rand(.15, .85) * innerWidth, rand(.12, .42) * innerHeight, 90, Math.random() < .5 ? PARTY : GOLD, 9, false);
 function fxLoop() {
-  fx.clearRect(0, 0, fc.width, fc.height);
-  fx.globalCompositeOperation = "lighter";
+  fx.clearRect(0, 0, fc.width, fc.height); fx.globalCompositeOperation = "lighter";
   for (const p of sparks) {
-    p.vy += .06 * DPR; p.vx *= .985; p.vy *= .985; p.x += p.vx; p.y += p.vy; p.life -= .012;
+    p.vy += p.g * DPR; p.vx *= .985; p.vy *= .985; p.x += p.vx; p.y += p.vy; p.life -= .012;
     fx.globalAlpha = Math.max(0, p.life); fx.fillStyle = p.c;
     if (p.star) { fx.save(); fx.translate(p.x, p.y); fx.rotate(p.life * 4); fx.fillRect(-p.r * 2, -p.r / 3, p.r * 4, p.r / 1.5); fx.fillRect(-p.r / 3, -p.r * 2, p.r / 1.5, p.r * 4); fx.restore(); }
     else { fx.beginPath(); fx.arc(p.x, p.y, p.r, 0, 6.283); fx.fill(); }
@@ -72,11 +53,13 @@ function fxLoop() {
   sparks = sparks.filter(p => p.life > 0);
   fxRaf = sparks.length ? requestAnimationFrame(fxLoop) : 0;
 }
-addEventListener("pointerdown", e => { if (!$("#gate").isConnected || $("#gate").style.display === "none") burst(e.clientX, e.clientY, 18, ICE, 4); }, { passive: true });
+let opened = false;
+addEventListener("pointerdown", e => { if (opened) burst(e.clientX, e.clientY, 16, ICE, 4); }, { passive: true });
 
-/* ---------- music ---------- */
-const music = { mode: null, on: true, yt: null };
-const songAudio = $("#songAudio");
+/* =========================================================
+   MUSIC
+   ========================================================= */
+const music = { mode: null, on: true, yt: null }, songAudio = $("#songAudio");
 async function initMusic() {
   try {
     const r = await fetch(C.music.local, { method: "HEAD" });
@@ -84,18 +67,14 @@ async function initMusic() {
   } catch (e) {}
   music.mode = "yt"; $("#ytSlot").classList.add("on");
   window.onYouTubeIframeAPIReady = () => {
-    music.yt = new YT.Player("ytPlayer", {
-      width: 320, height: 180, videoId: C.music.youtubeId,
+    music.yt = new YT.Player("ytPlayer", { width: 320, height: 180, videoId: C.music.youtubeId,
       playerVars: { playsinline: 1, controls: 1, loop: 1, playlist: C.music.youtubeId, rel: 0 },
-      events: { onReady: e => { e.target.setVolume(60); if (music.on) e.target.playVideo(); } }
-    });
+      events: { onReady: e => { e.target.setVolume(60); if (music.on) e.target.playVideo(); } } });
   };
   const s = document.createElement("script"); s.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(s);
 }
 function setMusic(on) {
-  music.on = on;
-  $("#musicBtn").classList.toggle("off", !on);
-  $(".disc").classList.toggle("paused", !on);
+  music.on = on; $("#musicBtn").classList.toggle("off", !on); $(".disc").classList.toggle("paused", !on);
   $("#songToggle").textContent = on ? "Pause ❚❚" : "Play ▶";
   if (music.mode === "local") on ? songAudio.play().catch(() => {}) : songAudio.pause();
   else if (music.yt && music.yt.playVideo) on ? music.yt.playVideo() : music.yt.pauseVideo();
@@ -103,24 +82,150 @@ function setMusic(on) {
 $("#musicBtn").addEventListener("click", () => setMusic(!music.on));
 $("#songToggle").addEventListener("click", () => setMusic(!music.on));
 
-/* ---------- helpers ---------- */
-// split into chars, but keep each word unbreakable so titles wrap between words only
+/* =========================================================
+   HERO: layered scene + toys holding the banner
+   ========================================================= */
+const hero = { toys: [], flags: [], ready: false };
+
+function buildTwinkles() {
+  const host = $("#twinkle");
+  for (let i = 0; i < 34; i++) {
+    const s = document.createElement("i");
+    s.style.left = rand(2, 98) + "%"; s.style.top = rand(2, 95) + "%";
+    s.style.animationDelay = rand(0, 3) + "s"; s.style.animationDuration = rand(2, 4.5) + "s";
+    s.style.transform = `scale(${rand(.5, 1.2)})`; host.appendChild(s);
+  }
+}
+
+function buildToys(container, imgs, withBanner) {
+  const toys = [];
+  imgs.forEach((img, i) => {
+    const el = document.createElement("img"); el.src = img.src; el.className = "toy"; el.alt = ""; el.draggable = false;
+    container.appendChild(el); toys.push({ el, i });
+  });
+  return toys;
+}
+
+function layoutToys(toys, container) {
+  const W = container.clientWidth, xs = [.1, .3, .5, .7, .9], lift = [0, .1, .04, .1, 0], H = container.clientHeight;
+  toys.forEach((t, i) => { const w = t.el.offsetWidth; gsap.set(t.el, { left: W * xs[i] - w / 2, bottom: H * lift[i] }); t.cx = W * xs[i]; t.bottom = H * lift[i]; });
+}
+
+function idleToys(toys, big = false) {
+  toys.forEach((t, i) => {
+    const amp = (big ? 26 : 12) + i % 2 * 6, d = .42 + (i % 3) * .08;
+    t.idle = gsap.timeline({ repeat: -1, delay: i * .13 })
+      .to(t.el, { y: -amp, scaleY: 1.04, scaleX: .97, duration: d, ease: "sine.out" })
+      .to(t.el, { y: 0, scaleY: .94, scaleX: 1.05, duration: d, ease: "sine.in" })
+      .to(t.el, { scaleY: 1, scaleX: 1, duration: .14 });
+    gsap.to(t.el, { rotation: i % 2 ? 5 : -5, duration: rand(.9, 1.3), yoyo: true, repeat: -1, ease: "sine.inOut", delay: i * .2 });
+    t.el.addEventListener("click", () => {
+      const r = t.el.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height * .3, 40, PARTY, 7);
+      gsap.timeline().to(t.el, { y: -120, rotation: "+=360", duration: .55, ease: "power2.out" }).to(t.el, { y: 0, duration: .45, ease: "bounce.out" });
+    });
+  });
+}
+
+// The rope runs through each toy's raised hands and sags between them; flags hang from it.
+const BANNER = (C.banner || "HAPPY BIRTHDAY").split("");
+function buildFlags() {
+  const host = $("#flags");
+  hero.flags = BANNER.map((ch, k) => {
+    const f = document.createElement("div"); f.className = "flag"; f.innerHTML = `<b>${ch === " " ? "" : ch}</b>`;
+    if (ch === " ") f.style.visibility = "hidden";
+    host.appendChild(f); return { el: f, k };
+  });
+}
+function updateBanner(t) {
+  const box = $("#heroToys"); if (!hero.toys.length) return;
+  const H = box.clientHeight, W = box.clientWidth;
+  const svg = $(".bunting"); svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const pts = hero.toys.map(toy => {
+    const y = gsap.getProperty(toy.el, "y"), h = toy.el.offsetHeight;
+    return { x: toy.cx, hy: H - toy.bottom - h * .97 + y, y: H - toy.bottom - h * .97 + y - H * .26 };
+  });
+  let sticks = "";
+  for (const p of pts) sticks += `M${p.x},${p.hy + 4} L${p.x},${p.y} `;
+  const segs = [];
+  let d = `M${pts[0].x},${pts[0].y}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const a = pts[i], b = pts[i + 1], c = { x: (a.x + b.x) / 2, y: Math.max(a.y, b.y) + H * .1 };
+    d += ` Q${c.x},${c.y} ${b.x},${b.y}`; segs.push([a, c, b]);
+  }
+  $("#rope").setAttribute("d", d); $("#sticks").setAttribute("d", sticks);
+  const N = BANNER.length, S = segs.length;
+  hero.flags.forEach(f => {
+    const u = (f.k + .5) / N * S, s = Math.min(S - 1, Math.floor(u)), lt = .1 + (u - s) * .8;
+    const [a, c, b] = segs[s], m = 1 - lt;
+    const x = m * m * a.x + 2 * m * lt * c.x + lt * lt * b.x, y = m * m * a.y + 2 * m * lt * c.y + lt * lt * b.y;
+    const dx = 2 * m * (c.x - a.x) + 2 * lt * (b.x - c.x), dy = 2 * m * (c.y - a.y) + 2 * lt * (b.y - c.y);
+    const ang = Math.atan2(dy, dx) * 57.3 + Math.sin(t * 2.2 + f.k * .8) * 7;
+    f.el.style.transform = `translate(${x}px,${y}px) rotate(${ang}deg) scale(${f.s ?? 1})`;
+  });
+}
+
+function parallax() {
+  const layers = $$("[data-depth]").map(el => ({ x: gsap.quickTo(el, "x", { duration: 1.2, ease: "power3.out" }), y: gsap.quickTo(el, "y", { duration: 1.2, ease: "power3.out" }), d: +el.dataset.depth }));
+  const move = (nx, ny) => layers.forEach(l => { l.x(nx * l.d); l.y(ny * l.d * .5); });
+  addEventListener("pointermove", e => move(e.clientX / innerWidth - .5, e.clientY / innerHeight - .5), { passive: true });
+  addEventListener("deviceorientation", e => { if (e.gamma == null) return; move(Math.max(-1, Math.min(1, e.gamma / 30)) * .5, Math.max(-1, Math.min(1, (e.beta - 45) / 30)) * .5); }, { passive: true });
+}
+
+async function setupHero() {
+  $("#heroKicker").textContent = C.hero.kicker;
+  $("#heroName").textContent = C.name;
+  buildTwinkles();
+  const [bg, princess, ...toyImgs] = await Promise.all([loadImg(C.art.bg), loadImg(C.art.princess), ...C.art.toys.map(loadImg)]);
+  $("#bgImg").src = bg ? bg.src : C.art.hero;
+  if (princess) $("#princessImg").src = princess.src; else $("#hero").classList.add("flat");
+  const toys = toyImgs.filter(Boolean);
+  hero.imgs = toys;
+  if (toys.length === 5) {
+    hero.toys = buildToys($("#heroToys"), toys, true);
+    await Promise.all(hero.toys.map(t => t.el.decode().catch(() => {})));
+    layoutToys(hero.toys, $("#heroToys")); buildFlags();
+    addEventListener("resize", () => layoutToys(hero.toys, $("#heroToys")));
+    gsap.ticker.add(time => updateBanner(time));
+  } else $(".bunting").style.display = "none";
+  // princess hand sparkles
+  setInterval(() => {
+    if (!opened || !princess || scrollY > innerHeight) return;
+    const r = $("#princessImg").getBoundingClientRect(); burst(r.left + r.width * .8, r.top + r.height * .12, 6, ICE, 2.2, true, -.01);
+  }, 420);
+  parallax();
+}
+
+function playHero() {
+  const tl = gsap.timeline();
+  tl.fromTo(".l-bg", { scale: 1.35, filter: "blur(16px) brightness(1.7)" }, { scale: 1, filter: "blur(0px) brightness(1)", duration: 2.8, ease: "power3.out", clearProps: "filter" }, 0)
+    .from(".l-princess img", { y: 120, opacity: 0, duration: 2.0, ease: "power3.out" }, .5)
+    .from("#heroKicker", { opacity: 0, y: 16, letterSpacing: "1em", duration: 1.2, ease: "power2.out" }, 1.0)
+    .fromTo("#heroName", { clipPath: "inset(-20% 100% -20% 0)" }, { clipPath: "inset(-20% 0% -20% 0)", duration: 2.2, ease: "power2.inOut",
+      onUpdate() { if (Math.random() < .5) { const r = $("#heroName").getBoundingClientRect(); burst(r.left + r.width * this.progress(), r.top + r.height * rand(.3, .8), 3, GOLD, 2.5); } } }, 1.3);
+  hero.toys.forEach((t, i) => tl.from(t.el, { y: 260, rotation: rand(-30, 30), duration: .9, ease: "back.out(1.8)" }, 1.8 + i * .14));
+  hero.flags.forEach((f, i) => { f.s = 0; tl.to(f, { s: 1, duration: .5, ease: "back.out(3)" }, 2.9 + i * .06); });
+  tl.add(() => idleToys(hero.toys), 3.1).from(".scrollhint", { opacity: 0, duration: .8 }, 3.6);
+  // scroll-out: each layer at its own speed
+  const out = { trigger: "#hero", start: "top top", end: "bottom top", scrub: true };
+  gsap.to(".l-bg img", { yPercent: 12, ease: "none", scrollTrigger: out });
+  gsap.to(".l-princess img", { yPercent: 26, ease: "none", scrollTrigger: out });
+  gsap.to("#heroToys", { yPercent: 70, ease: "none", scrollTrigger: out });
+  gsap.to(".hero-title", { yPercent: -80, opacity: 0, ease: "none", scrollTrigger: out });
+}
+
+/* =========================================================
+   STORY CONTENT
+   ========================================================= */
 const splitChars = el => { el.innerHTML = el.textContent.split(" ").map(w => `<span class="wd">${Array.from(w).map(c => `<span class="ch">${c}</span>`).join("")}</span>`).join(" "); return el.querySelectorAll(".ch"); };
 const reveal = (targets, trigger, vars = {}, start = "top 82%") =>
   gsap.from(targets, { y: 40, opacity: 0, filter: "blur(8px)", duration: 1, ease: "power3.out", stagger: .12, ...vars, scrollTrigger: { trigger, start, toggleActions: "play none none reverse" } });
+const art = (img, src) => { img.onerror = () => { img.onerror = null; img.src = C.art.hero; }; img.src = src; };
 
-/* ---------- fill content ---------- */
-$("#gateTitle").textContent = `For ${C.name}`;
-$("#heroKicker").textContent = C.hero.kicker;
-$("#heroTitle").textContent = C.hero.title;
-$("#heroLine").textContent = C.hero.line;
+$("#gateTitle").textContent = C.name;
+art($("#palaceImg"), C.art.palace); art($("#coupleImg"), C.art.couple); art($("#ballroomImg"), C.art.ballroom);
 $("#prologueText").innerHTML = C.prologue.map(l => `<p>${l}</p>`).join("");
-$("#braveN").textContent = `Chapter ${C.brave.n}`;
-$("#braveTitle").textContent = C.brave.title;
-$("#braveText").textContent = C.brave.text;
-$("#lovesTitle").textContent = C.loves.title;
-$("#songTitle").textContent = C.music.title;
-$("#wish").textContent = C.finale.wish;
+$("#braveN").textContent = `Chapter ${C.brave.n}`; $("#braveTitle").textContent = C.brave.title; $("#braveText").textContent = C.brave.text;
+$("#lovesTitle").textContent = C.loves.title; $("#songTitle").textContent = C.music.title;
 
 function chapterHTML(ch) {
   let media = "";
@@ -133,28 +238,21 @@ function chapterHTML(ch) {
 $("#chapters").innerHTML = C.chapters.map(chapterHTML).join("");
 $("#ending").innerHTML = chapterHTML({ ...C.ending, date: "Always" });
 $("#crystals").innerHTML = C.loves.items.map(it => `<div class="crystal" role="button" tabindex="0"><div class="f"><b>${it.icon}</b><span>${it.front}</span></div><div class="bk">${it.back}</div></div>`).join("");
+$$(".crystal").forEach(c => c.addEventListener("click", () => { c.classList.toggle("flip"); const r = c.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, 34, ICE, 6); }));
 
-/* ---------- scroll choreography ---------- */
 function choreograph() {
-  // hero: slow push-in + fade out as you scroll
-  gsap.fromTo("#heroImg", { scale: 1.08 }, { scale: 1.32, yPercent: 8, ease: "none", scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true } });
-  gsap.to(".hero-text", { yPercent: -60, opacity: 0, ease: "none", scrollTrigger: { trigger: "#hero", start: "30% top", end: "bottom top", scrub: true } });
-
-  // prologue: lines fade in one by one while the palace zooms
   const pl = gsap.timeline({ scrollTrigger: { trigger: "#prologue", start: "top top", end: "bottom bottom", scrub: 1 } });
   pl.fromTo("#palaceImg", { scale: 1.25 }, { scale: 1, ease: "none", duration: 4 }, 0);
   $$("#prologueText p").forEach((p, i) => pl.from(p, { opacity: 0, y: 30, filter: "blur(10px)", duration: .8 }, .3 + i * .8));
   pl.to("#prologueText", { opacity: 0, y: -40, duration: .6 }, 3.6);
 
-  // chapters
   $$(".chapter").forEach(el => {
     const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 78%", toggleActions: "play none none reverse" } });
     tl.from(el.querySelector(".numeral"), { scale: 2.2, opacity: 0, filter: "blur(12px)", duration: 1.1, ease: "power3.out" })
       .from(el.querySelectorAll(".date, h3"), { y: 24, opacity: 0, duration: .7, stagger: .12 }, "<.3")
       .from(el.querySelector(".glass"), { y: 70, opacity: 0, rotationX: 18, transformPerspective: 900, duration: 1, ease: "power3.out" }, "<.2");
     const fr = el.querySelector(".frame");
-    if (fr) gsap.fromTo(fr, { clipPath: "polygon(50% 0%,50% 0%,50% 100%,50% 100%)" }, { clipPath: "polygon(0% 0%,100% 0%,100% 100%,0% 100%)", duration: 1.3, ease: "power3.inOut",
-      scrollTrigger: { trigger: fr, start: "top 85%", toggleActions: "play none none reverse" } });
+    if (fr) gsap.fromTo(fr, { clipPath: "polygon(50% 0%,50% 0%,50% 100%,50% 100%)" }, { clipPath: "polygon(0% 0%,100% 0%,100% 100%,0% 100%)", duration: 1.3, ease: "power3.inOut", scrollTrigger: { trigger: fr, start: "top 85%", toggleActions: "play none none reverse" } });
     const chat = el.querySelectorAll(".chat span");
     if (chat.length) gsap.from(chat, { scale: .6, opacity: 0, duration: .45, stagger: .5, ease: "back.out(2)", scrollTrigger: { trigger: el.querySelector(".chat"), start: "top 80%" } });
     reveal(el.querySelector(".text"), el.querySelector(".text"), {}, "top 90%");
@@ -162,35 +260,17 @@ function choreograph() {
   const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? e.target.play().catch(() => {}) : e.target.pause()), { threshold: .35 });
   $$("video").forEach(v => io.observe(v));
 
-  // the bravest heart
   const br = gsap.timeline({ scrollTrigger: { trigger: "#brave", start: "top top", end: "bottom bottom", scrub: 1 } });
   br.fromTo("#coupleImg", { scale: 1.3, yPercent: -4 }, { scale: 1.02, yPercent: 0, ease: "none", duration: 3 }, 0)
-    .from("#braveN", { opacity: 0, y: 20, duration: .4 }, .6)
-    .from("#braveTitle", { opacity: 0, y: 30, filter: "blur(10px)", duration: .6 }, .8)
-    .from("#braveText", { opacity: 0, y: 30, duration: .6 }, 1.3);
+    .from("#braveN", { opacity: 0, y: 20, duration: .4 }, .6).from("#braveTitle", { opacity: 0, y: 30, filter: "blur(10px)", duration: .6 }, .8).from("#braveText", { opacity: 0, y: 30, duration: .6 }, 1.3);
 
-  // crystals
   gsap.from(".crystal", { y: 60, opacity: 0, rotationY: -60, duration: .9, stagger: .1, ease: "back.out(1.6)", scrollTrigger: { trigger: "#crystals", start: "top 82%" } });
   reveal("#loves .kicker, #lovesTitle", "#loves");
-
-  reveal("#song .glass", "#song");
-  reveal("#counter .kicker, #counter h2", "#counter");
-  reveal("#letter .kicker, #letter h2, .seal-wrap", "#letter");
-
-  // finale wish
-  ScrollTrigger.create({ trigger: "#finale", start: "top 35%", once: true, onEnter: () => {
-    gsap.from(splitChars($("#wish")), { opacity: 0, y: -30, filter: "blur(8px)", stagger: .05, duration: .8, ease: "back.out(2)" });
-  } });
+  reveal("#song .glass", "#song"); reveal("#counter .kicker, #counter h2", "#counter"); reveal("#letter .kicker, #letter h2, .seal-wrap", "#letter");
   gsap.fromTo("#ballroomImg", { scale: 1.2 }, { scale: 1, ease: "none", scrollTrigger: { trigger: "#finale", start: "top bottom", end: "top top", scrub: true } });
 }
 
-/* ---------- crystals tap ---------- */
-$$(".crystal").forEach(c => c.addEventListener("click", e => {
-  c.classList.toggle("flip");
-  const r = c.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, 34, ICE, 6);
-}));
-
-/* ---------- counter ---------- */
+/* counter */
 const t0 = new Date(C.together).getTime();
 const parts = () => { const d = Math.max(0, Date.now() - t0) / 1000; return [Math.floor(d / 86400), Math.floor(d % 86400 / 3600), Math.floor(d % 3600 / 60), Math.floor(d % 60)]; };
 const cIds = ["#cD", "#cH", "#cM", "#cS"]; let live = false;
@@ -198,11 +278,10 @@ setInterval(() => { if (live) parts().forEach((v, i) => ($(cIds[i]).textContent 
 ScrollTrigger.create({ trigger: "#counter", start: "top 80%", once: true, onEnter: () => {
   gsap.from("#counter .clock div", { rotationX: -90, opacity: 0, transformPerspective: 600, stagger: .12, duration: .8, ease: "back.out(1.7)" });
   const p = parts(), o = { a: 0, b: 0, c: 0, d: 0 };
-  gsap.to(o, { a: p[0], b: p[1], c: p[2], d: p[3], duration: 2.4, ease: "power3.out",
-    onUpdate: () => [o.a, o.b, o.c, o.d].forEach((v, i) => ($(cIds[i]).textContent = Math.round(v))), onComplete: () => (live = true) });
+  gsap.to(o, { a: p[0], b: p[1], c: p[2], d: p[3], duration: 2.4, ease: "power3.out", onUpdate: () => [o.a, o.b, o.c, o.d].forEach((v, i) => ($(cIds[i]).textContent = Math.round(v))), onComplete: () => (live = true) });
 } });
 
-/* ---------- letter ---------- */
+/* letter */
 $("#seal").addEventListener("click", async () => {
   const s = $("#seal"), r = s.getBoundingClientRect();
   burst(r.left + r.width / 2, r.top + r.height / 2, 60, GOLD.concat(ICE), 8);
@@ -213,64 +292,43 @@ $("#seal").addEventListener("click", async () => {
   for (const line of C.letter) {
     const p = document.createElement("p"); host.appendChild(p);
     const caret = document.createElement("span"); caret.className = "caret";
-    for (const ch of Array.from(line)) { p.textContent += ch; p.appendChild(caret); await sleep(".,!?".includes(ch) ? 220 : 32); }
-    caret.remove(); await sleep(420);
+    for (const ch of Array.from(line)) { p.textContent += ch; p.appendChild(caret); await sleep(".,!?".includes(ch) ? 220 : 30); }
+    caret.remove(); await sleep(400);
   }
 });
 
-/* ---------- finale: blow out the candles ---------- */
-let out = false;
-async function extinguish() {
-  if (out) return; out = true;
-  ["#blowBtn", "#tapBlow", "#blowHint"].forEach(s => ($(s).hidden = true));
-  $("#glow").classList.add("out");
-  gsap.to("#ballroomImg", { filter: "brightness(.62) saturate(.85)", duration: .6, ease: "power2.out" });   // candles go out
-  gsap.to("#wish", { opacity: 0, y: -20, duration: .5 });
-  boost = 2.5;
-  for (let i = 0; i < 14; i++) setTimeout(firework, 300 + i * 380);
-  burst(innerWidth / 2, innerHeight * .45, 160, GOLD.concat(ICE), 11);
-  await sleep(900);
-  const ft = $("#finalTitle"); ft.textContent = C.finale.title; ft.hidden = false;
-  gsap.from(splitChars(ft), { opacity: 0, y: 40, scale: .4, filter: "blur(10px)", stagger: .06, duration: .9, ease: "back.out(2.2)" });
-  await sleep(1800);
-  const s = $("#surprise"); s.textContent = C.finale.surprise; s.hidden = false;
-  gsap.from(s, { opacity: 0, y: 20, duration: 1 });
-}
-$("#tapBlow").addEventListener("click", extinguish);
-$("#blowBtn").addEventListener("click", async () => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
-    const ac = new (window.AudioContext || window.webkitAudioContext)(), an = ac.createAnalyser(); an.fftSize = 1024;
-    ac.createMediaStreamSource(stream).connect(an);
-    const buf = new Uint8Array(an.fftSize); $("#blowBtn").textContent = "Now blow… 💨";
-    let base = 0, n = 0, hot = 0; const ts = performance.now();
-    const poll = () => {
-      if (out) { stream.getTracks().forEach(t => t.stop()); ac.close(); return; }
-      an.getByteTimeDomainData(buf); let sum = 0; for (const v of buf) sum += ((v - 128) / 128) ** 2; const rms = Math.sqrt(sum / buf.length);
-      if (performance.now() - ts < 700) { base = (base * n + rms) / (n + 1); n++; }
-      else { hot = rms > Math.max(.12, base * 3.5) ? hot + 1 : Math.max(0, hot - 1); $("#glow").style.opacity = String(1 - Math.min(.7, rms * 3)); if (hot > 16) return extinguish(); }
-      requestAnimationFrame(poll);
-    };
-    poll();
-  } catch (e) { $("#blowBtn").hidden = true; }
-});
+/* finale: the party starts by itself */
+ScrollTrigger.create({ trigger: "#finale", start: "top 35%", once: true, onEnter: async () => {
+  const ft = $("#finalTitle"); ft.textContent = C.finale.title;
+  gsap.fromTo(ft, { clipPath: "inset(-20% 100% -20% 0)" }, { clipPath: "inset(-20% 0% -20% 0)", duration: 2.2, ease: "power2.inOut" });
+  boost = 2;
+  for (let i = 0; i < 16; i++) setTimeout(firework, 200 + i * 420);
+  if (hero.imgs && hero.imgs.length === 5) {
+    const ft2 = buildToys($("#finaleToys"), hero.imgs); await Promise.all(ft2.map(t => t.el.decode().catch(() => {})));
+    layoutToys(ft2, $("#finaleToys"));
+    ft2.forEach((t, i) => gsap.from(t.el, { y: 240, duration: .8, ease: "back.out(1.8)", delay: .6 + i * .12 }));
+    setTimeout(() => idleToys(ft2, true), 1600);
+  }
+  await sleep(2400);
+  const s = $("#surprise"); s.textContent = C.finale.surprise; gsap.from(s, { opacity: 0, y: 20, duration: 1 });
+} });
 
-/* ---------- gate ---------- */
+/* =========================================================
+   GATE
+   ========================================================= */
 if (C.password) $("#pw").hidden = false;
+const ready = setupHero();
 $("#openBtn").addEventListener("click", async () => {
   if (C.password && $("#pw").value.trim().toLowerCase() !== C.password.toLowerCase()) { $("#pwErr").hidden = false; return; }
   const r = $("#openBtn").getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, 80, ICE, 9);
+  if (window.DeviceOrientationEvent && DeviceOrientationEvent.requestPermission) DeviceOrientationEvent.requestPermission().catch(() => {});
   initMusic(); $("#musicBtn").hidden = false;
+  await ready;
   await gsap.to("#flash", { opacity: 1, duration: .35, ease: "power2.in" });
-  $("#gate").style.display = "none";
+  $("#gate").style.display = "none"; opened = true;
   gsap.to("#flash", { opacity: 0, duration: 1.2, ease: "power2.out" });
-  gsap.from("#heroImg", { scale: 1.5, filter: "blur(14px) brightness(1.6)", duration: 2.6, ease: "power3.out" });
-  gsap.from("#heroKicker", { opacity: 0, y: 20, duration: 1, delay: .8 });
-  gsap.from(splitChars($("#heroTitle")), { opacity: 0, y: 50, rotationX: -90, filter: "blur(10px)", stagger: .06, duration: 1.1, ease: "back.out(1.8)", delay: 1.1 });
-  gsap.from("#heroLine", { opacity: 0, y: 20, duration: 1.2, delay: 2.2 });
-  gsap.from(".scrollhint", { opacity: 0, duration: 1, delay: 3 });
-  setTimeout(() => { document.body.classList.remove("locked"); ScrollTrigger.refresh(); }, 1800);
+  playHero();
+  setTimeout(() => { document.body.classList.remove("locked"); ScrollTrigger.refresh(); }, 2000);
 });
-
 choreograph();
 })();
