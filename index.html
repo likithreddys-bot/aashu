@@ -4,75 +4,131 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#ff9a3c">
-<title>For Aashu</title>
-<link rel="preload" href="fonts/fredoka-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/style.css">
-<script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+<meta name="theme-color" content="#070b1f">
+<title>For Princess Aashu</title>
+<link rel="preload" href="assets/anime/hero.jpg" as="image">
+<link rel="stylesheet" href="css/frozen.css">
 </head>
 <body class="locked">
 
-<canvas id="stage3d" aria-hidden="true"></canvas>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<canvas id="snow" aria-hidden="true"></canvas>
+<canvas id="fx" aria-hidden="true"></canvas>
 
-<!-- Gate: a gift box that opens -->
+<!-- Gate -->
 <section id="gate" class="gate">
-  <div class="rays" aria-hidden="true"></div>
-  <div class="gift" id="gift" aria-hidden="true">
-    <div class="lid"><div class="bow"><i></i><i></i></div></div>
-    <div class="box"><div class="ribbon"></div></div>
-  </div>
-  <h1 id="gateTitle">Aashu, this is for you</h1>
-  <p class="gate-sub">Turn your volume up a little 🔊</p>
+  <div class="crest" aria-hidden="true">❄</div>
+  <p class="gate-kicker">A winter tale</p>
+  <h1 id="gateTitle">For Aashu</h1>
+  <p class="gate-sub">Headphones on. Volume up a little.</p>
   <input id="pw" type="password" placeholder="secret word" autocomplete="off" hidden>
-  <button id="openBtn" class="btn">Open your gift</button>
-  <p id="pwErr" class="err" hidden>Hmm, not that one. Try again 😉</p>
-  <p id="loading" class="loading">getting things ready…</p>
+  <button id="openBtn" class="btn">Begin the story</button>
+  <p id="pwErr" class="err" hidden>Not quite. Try again ❄</p>
 </section>
 <div id="flash" aria-hidden="true"></div>
 
-<!-- Intro overlay -->
-<div id="hud" hidden>
-  <h2 class="title" id="title"><span class="t1">Happy Birthday</span><span class="t2" id="titleName"></span></h2>
-  <div class="bubble" id="bubble" hidden><b class="who" id="bubbleWho"></b><span id="bubbleText"></span><i class="tap">tap ▸</i></div>
-  <button class="skip" id="skip">Skip intro ▸</button>
-  <div class="scrollhint" id="scrollHint" hidden><span>Scroll down</span><i></i></div>
-</div>
-
 <button id="musicBtn" class="music-btn" aria-label="Music on or off" hidden><span class="eq"><i></i><i></i><i></i></span></button>
-<div id="ytPlayer"></div>
 <audio id="songAudio" loop preload="none"></audio>
-<audio id="voice" preload="none"></audio>
 
 <main id="story">
-  <div class="intro-space"></div>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero-art"><img id="heroImg" alt=""></div>
+    <div class="hero-shade"></div>
+    <div class="hero-text">
+      <p class="kicker" id="heroKicker"></p>
+      <h2 class="shimmer" id="heroTitle"></h2>
+      <p class="hero-line" id="heroLine"></p>
+    </div>
+    <div class="scrollhint"><span>Scroll</span><i></i></div>
+  </section>
+
+  <!-- Prologue over the ice palace -->
+  <section class="prologue" id="prologue">
+    <div class="sticky">
+      <div class="bg"><img id="palaceImg" alt=""></div>
+      <div class="bg-shade"></div>
+      <div class="prologue-text" id="prologueText"></div>
+    </div>
+  </section>
+
   <section id="chapters"></section>
-  <section id="drama" class="block"></section>
-  <section id="song" class="block"></section>
-  <section id="gallery" class="block"></section>
-  <section id="bearBlock" class="block"></section>
-  <section id="counter" class="block"></section>
-  <section id="quiz" class="block"></section>
-  <section id="letter" class="block"></section>
-  <section id="finale">
-    <div class="finale-ui">
-      <h2 id="wish"></h2>
-      <div class="finale-bottom">
-        <div class="bubble finale-bubble" id="finaleBubble" hidden><b class="who">Masha</b><span id="finaleText"></span></div>
-        <p class="hint" id="blowHint">Blow into your phone to blow out the candle</p>
-        <button class="btn" id="blowBtn">Blow 🎤</button>
-        <button class="link" id="tapBlow">or just tap here</button>
-        <p class="surprise" id="surprise" hidden></p>
-        <p class="song-credit" id="songCredit" hidden></p>
+
+  <!-- The bravest heart, over the couple art -->
+  <section class="brave" id="brave">
+    <div class="sticky">
+      <div class="bg"><img id="coupleImg" alt=""></div>
+      <div class="bg-shade"></div>
+      <div class="brave-text">
+        <p class="kicker" id="braveN"></p>
+        <h3 class="shimmer" id="braveTitle"></h3>
+        <p id="braveText"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="loves">
+    <p class="kicker">Tap each crystal</p>
+    <h2 id="lovesTitle"></h2>
+    <div class="crystals" id="crystals"></div>
+  </section>
+
+  <section id="ending"></section>
+
+  <section class="block" id="song">
+    <div class="glass song">
+      <div class="disc" aria-hidden="true"><i></i></div>
+      <div>
+        <p class="kicker">Our song</p>
+        <h3 id="songTitle"></h3>
+        <p class="small">The song I sing for you. Every word, every time.</p>
+        <button class="btn sm" id="songToggle">Pause ❚❚</button>
+      </div>
+      <div class="yt-slot" id="ytSlot"><div id="ytPlayer"></div></div>
+    </div>
+  </section>
+
+  <section class="block" id="counter">
+    <p class="kicker">Our kingdom, since 11 January 2025</p>
+    <h2>Every second with you</h2>
+    <div class="clock">
+      <div><b id="cD">0</b><span>days</span></div>
+      <div><b id="cH">0</b><span>hours</span></div>
+      <div><b id="cM">0</b><span>minutes</span></div>
+      <div><b id="cS">0</b><span>seconds</span></div>
+    </div>
+  </section>
+
+  <section class="block" id="letter">
+    <p class="kicker">A royal letter</p>
+    <h2>For your eyes only</h2>
+    <div class="seal-wrap"><button class="seal" id="seal" aria-label="Open the letter">A</button><p class="small">Tap the seal</p></div>
+    <div class="scroll-paper" id="paper" hidden><div id="letterText"></div></div>
+  </section>
+
+  <section class="finale" id="finale">
+    <div class="sticky">
+      <div class="bg"><img id="ballroomImg" alt=""></div>
+      <div class="bg-shade light"></div>
+      <div class="candle-glow" id="glow" aria-hidden="true"></div>
+      <div class="finale-ui">
+        <h2 class="shimmer" id="wish"></h2>
+        <div class="finale-bottom">
+          <p class="hint" id="blowHint">Blow into your phone to blow out the candles</p>
+          <button class="btn" id="blowBtn">Blow 🎤</button>
+          <button class="link" id="tapBlow">or just tap here</button>
+          <h2 class="shimmer big" id="finalTitle" hidden></h2>
+          <p class="surprise" id="surprise" hidden></p>
+        </div>
       </div>
     </div>
   </section>
 </main>
 
-<canvas id="confetti" aria-hidden="true"></canvas>
-
 <script src="vendor/gsap.min.js"></script>
 <script src="vendor/ScrollTrigger.min.js"></script>
 <script src="content.js"></script>
-<script type="module" src="js/main.js"></script>
+<script src="js/frozen.js"></script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 # For Aashu
 
-A birthday website: a 3D Masha-style intro (Three.js), a scroll story (GSAP), and a candle-blowing finale.
+A birthday website in an anime ice-princess style: aurora, snow, scroll-driven story chapters (GSAP), and a candle-blowing finale.
+The live page is `index.html` + `css/frozen.css` + `js/frozen.js`. AI art lives in `assets/anime/`.
 Static files only, no build step. Hosted with GitHub Pages from `main`.
 
 ## Edit
