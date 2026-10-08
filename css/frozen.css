@@ -11,8 +11,8 @@
   --pad:max(18px,env(safe-area-inset-left));
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{background:var(--night)}
-body{background:var(--night);color:var(--ice2);font-family:var(--body);font-size:17px;line-height:1.6;overflow-x:hidden}
+html{background:var(--night);overflow-x:hidden;overflow-x:clip}
+body{background:var(--night);color:var(--ice2);font-family:var(--body);font-size:17px;line-height:1.6;overflow-x:hidden;overflow-x:clip;width:100%;position:relative}
 body.locked{overflow:hidden;height:100dvh}
 [hidden]{display:none!important}
 img,video{display:block;max-width:100%}
@@ -33,8 +33,8 @@ img,video{display:block;max-width:100%}
 .ch{display:inline-block}
 
 /* ---------- ambient ---------- */
-.aurora{position:fixed;inset:-20% -30%;z-index:0;pointer-events:none;filter:blur(60px);opacity:.5}
-.aurora i{position:absolute;left:0;right:0;height:38%;border-radius:50%;mix-blend-mode:screen;animation:drift 18s ease-in-out infinite alternate}
+.aurora{position:fixed;inset:-20% 0;overflow:hidden;z-index:0;pointer-events:none;filter:blur(60px);opacity:.5}
+.aurora i{position:absolute;left:-30%;right:-30%;height:38%;border-radius:50%;mix-blend-mode:screen;animation:drift 18s ease-in-out infinite alternate}
 .aurora i:nth-child(1){top:5%;background:linear-gradient(90deg,transparent,#2ff0c8,#3aa8ff,transparent)}
 .aurora i:nth-child(2){top:20%;background:linear-gradient(90deg,transparent,#9b7bff,#2ff0c8,transparent);animation-duration:24s;animation-delay:-6s}
 .aurora i:nth-child(3){top:35%;background:linear-gradient(90deg,transparent,#3aa8ff,#c08bff,transparent);animation-duration:30s;animation-delay:-12s;opacity:.7}
@@ -98,8 +98,8 @@ img,video{display:block;max-width:100%}
 .hero.flat .l-princess{display:none}
 
 /* ---------- sticky scenes ---------- */
-.prologue,.brave{position:relative;height:200vh}
-.finale{position:relative;height:160vh}
+.prologue,.brave{position:relative;height:150vh}
+.finale{position:relative;height:120vh}
 .sticky{position:sticky;top:0;height:100dvh;overflow:hidden}
 .bg{position:absolute;inset:0;overflow:hidden}
 .bg img{width:100%;height:100%;object-fit:cover;will-change:transform}
@@ -109,8 +109,9 @@ img,video{display:block;max-width:100%}
 .prologue-text p{font-family:var(--display);font-weight:600;font-size:clamp(1.5rem,6.6vw,2.2rem);line-height:1.3;text-shadow:0 2px 20px #000c;max-width:24rem}
 .prologue-text p:first-child{font-family:var(--script);font-weight:400;font-size:clamp(2.6rem,12vw,3.8rem);color:#fff}
 
-#chapters{padding:14vh 0 4vh}
-.chapter{max-width:34rem;margin:0 auto 18vh;padding:0 var(--pad)}
+#chapters{padding:6vh 0 2vh}
+.chapter{max-width:34rem;margin:0 auto 9vh;padding:0 var(--pad)}
+.chapter-head{overflow:clip;overflow-clip-margin:24px}
 .chapter-head{text-align:center;margin-bottom:1.3rem}
 .numeral{font-family:var(--script);font-size:4.6rem;line-height:1;color:#fff;text-shadow:0 0 30px #7fdcffaa}
 .chapter-head h3{font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,7vw,2.2rem);line-height:1.15;color:#fff;margin:.25rem 0}
@@ -129,9 +130,9 @@ img,video{display:block;max-width:100%}
 .brave-text h3{font-family:var(--script);font-weight:400;font-size:clamp(3rem,14vw,4.6rem);color:#fff;text-shadow:0 0 24px #7fdcffaa;margin-bottom:.6rem;line-height:1}
 .brave-text p{font-size:1.08rem;text-shadow:0 2px 16px #000e}
 
-.block{position:relative;max-width:36rem;margin:0 auto 18vh;padding:0 var(--pad);text-align:center}
+.block{position:relative;max-width:36rem;margin:0 auto 9vh;padding:0 var(--pad);text-align:center}
 .block h2{font-family:var(--script);font-weight:400;font-size:clamp(2.8rem,13vw,4.2rem);color:#fff;line-height:1.05;margin-bottom:1.3rem;text-shadow:0 0 24px #7fdcff88}
-#loves{padding-top:16vh}
+#loves{padding-top:6vh}
 .crystals{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;perspective:1000px}
 .crystal{position:relative;height:170px;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.3,1.4,.5,1);cursor:pointer}
 .crystal.flip{transform:rotateY(180deg)}
@@ -142,7 +143,7 @@ img,video{display:block;max-width:100%}
 .crystal .f span{font-family:var(--display);font-weight:600;font-size:1rem;color:#fff}
 .crystal .bk{transform:rotateY(180deg);background:linear-gradient(160deg,#eef9ff,#bfe8ff);color:#0b1638;font-size:.95rem;line-height:1.35;font-weight:600}
 
-#ending .chapter{margin-bottom:16vh}
+#ending .chapter{margin-bottom:9vh}
 .song{display:grid;grid-template-columns:110px 1fr;gap:1.1rem;align-items:center;text-align:left}
 .song h3{font-family:var(--display);font-weight:700;font-size:1.35rem;color:#fff;line-height:1.15}
 .disc{width:110px;height:110px;border-radius:50%;background:repeating-radial-gradient(circle,#18213f 0 2px,#0a1029 2px 4px);box-shadow:0 0 0 2px #bfe8ff44,0 0 30px #7fdcff55;display:grid;place-items:center;animation:spin 5s linear infinite}

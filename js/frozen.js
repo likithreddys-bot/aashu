@@ -155,7 +155,7 @@ function updateBanner(t) {
     d += ` Q${c.x},${c.y} ${b.x},${b.y}`; segs.push([a, c, b]);
   }
   $("#rope").setAttribute("d", d); $("#sticks").setAttribute("d", sticks);
-  hero.toys.forEach((toy, i) => { if (toy.badge) toy.badge.style.transform = `translate(${toy.cx + toy.el.offsetWidth * .32}px,${pts[i].hy + toy.el.offsetHeight * .62}px)`; });
+  hero.toys.forEach((toy, i) => { if (toy.badge) toy.badge.style.transform = `translate(${Math.min(W - 16, toy.cx + toy.el.offsetWidth * .32)}px,${pts[i].hy + toy.el.offsetHeight * .62}px)`; });
   const N = BANNER.length, S = segs.length;
   hero.flags.forEach(f => {
     const u = (f.k + .5) / N * S, s = Math.min(S - 1, Math.floor(u)), lt = .1 + (u - s) * .8;
@@ -288,16 +288,16 @@ $$(".crystal").forEach(c => c.addEventListener("click", () => { c.classList.togg
 function choreograph() {
   const pl = gsap.timeline({ scrollTrigger: { trigger: "#prologue", start: "top top", end: "bottom bottom", scrub: 1 } });
   pl.fromTo("#palaceImg", { scale: 1.25 }, { scale: 1, ease: "none", duration: 4 }, 0);
-  $$("#prologueText p").forEach((p, i) => pl.from(p, { opacity: 0, y: 30, filter: "blur(10px)", duration: .8 }, .3 + i * .8));
-  pl.to("#prologueText", { opacity: 0, y: -40, duration: .6 }, 3.6);
+  $$("#prologueText p").forEach((p, i) => pl.from(p, { opacity: 0, y: 30, filter: "blur(10px)", duration: .6 }, i * .6));
+  pl.to("#prologueText", { opacity: 0, y: -40, duration: .5 }, 3.4);
 
   $$(".chapter").forEach(el => {
-    const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 78%", toggleActions: "play none none reverse" } });
-    tl.from(el.querySelector(".numeral"), { scale: 2.2, opacity: 0, filter: "blur(12px)", duration: 1.1, ease: "power3.out" })
+    const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 92%", toggleActions: "play none none reverse" } });
+    tl.from(el.querySelector(".numeral"), { scale: 1.5, opacity: 0, filter: "blur(12px)", duration: .9, ease: "power3.out" })
       .from(el.querySelectorAll(".date, h3"), { y: 24, opacity: 0, duration: .7, stagger: .12 }, "<.3")
       .from(el.querySelector(".glass"), { y: 70, opacity: 0, rotationX: 18, transformPerspective: 900, duration: 1, ease: "power3.out" }, "<.2");
     const fr = el.querySelector(".frame");
-    if (fr) gsap.fromTo(fr, { clipPath: "polygon(50% 0%,50% 0%,50% 100%,50% 100%)" }, { clipPath: "polygon(0% 0%,100% 0%,100% 100%,0% 100%)", duration: 1.3, ease: "power3.inOut", scrollTrigger: { trigger: fr, start: "top 85%", toggleActions: "play none none reverse" } });
+    if (fr) gsap.fromTo(fr, { clipPath: "polygon(50% 0%,50% 0%,50% 100%,50% 100%)" }, { clipPath: "polygon(0% 0%,100% 0%,100% 100%,0% 100%)", duration: 1, ease: "power3.inOut", scrollTrigger: { trigger: fr, start: "top 96%", toggleActions: "play none none reverse" } });
     const chat = el.querySelectorAll(".chat span");
     if (chat.length) gsap.from(chat, { scale: .6, opacity: 0, duration: .45, stagger: .5, ease: "back.out(2)", scrollTrigger: { trigger: el.querySelector(".chat"), start: "top 80%" } });
     reveal(el.querySelector(".text"), el.querySelector(".text"), {}, "top 90%");
