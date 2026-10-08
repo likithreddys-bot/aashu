@@ -98,7 +98,7 @@ img,video{display:block;max-width:100%}
 .hero.flat .l-princess{display:none}
 
 /* ---------- sticky scenes ---------- */
-.prologue,.brave{position:relative;height:260vh}
+.prologue,.brave{position:relative;height:200vh}
 .finale{position:relative;height:160vh}
 .sticky{position:sticky;top:0;height:100dvh;overflow:hidden}
 .bg{position:absolute;inset:0;overflow:hidden}
@@ -117,7 +117,7 @@ img,video{display:block;max-width:100%}
 .chapter-head .date{font-weight:800;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--teal)}
 .glass{position:relative;background:var(--glass);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);border:1px solid var(--line);border-radius:24px;padding:1.2rem;box-shadow:0 0 40px #3aa8ff22,0 30px 60px #0008}
 .frame{position:relative;border-radius:18px;overflow:hidden;margin-bottom:1rem;box-shadow:0 0 0 1px #bfe8ff55,0 0 30px #7fdcff44}
-.frame img,.frame video{width:100%;max-height:66dvh;object-fit:cover}
+.frame img,.frame video{width:100%;max-height:74dvh;object-fit:cover}
 .frame::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,#ffffff40 48%,transparent 60%);transform:translateX(-120%);animation:glint 5s ease-in-out infinite}
 @keyframes glint{0%,60%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
 .chapter p.text{font-size:1.08rem}
@@ -176,3 +176,37 @@ img,video{display:block;max-width:100%}
 
 @media (min-width:900px){ .l-princess img{height:min(72dvh,860px)} .toys{max-height:300px} }
 @media (prefers-reduced-motion:reduce){.aurora i,.crest,.disc,.shimmer,.l-bg img,.l-princess img,.sheen{animation:none}}
+
+/* ---------- loader ---------- */
+.loader{position:relative;width:64px;height:64px;margin-top:.4rem}
+.loader svg{width:100%;height:100%;transform:rotate(-90deg)}
+.loader circle{fill:none;stroke:#ffffff22;stroke-width:3}
+.loader #loaderArc{stroke:var(--ice);stroke-linecap:round;stroke-dasharray:119.4;stroke-dashoffset:119.4;transition:stroke-dashoffset .3s;filter:drop-shadow(0 0 6px #7fdcff)}
+.loader span{position:absolute;inset:0;display:grid;place-items:center;font-weight:800;font-size:.75rem;opacity:.85}
+
+/* ---------- scroll progress ---------- */
+.progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:75;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,#5ff3d6,#7fdcff,#a98bff,#ff8fc4);box-shadow:0 0 10px #7fdcff}
+
+/* ---------- opening film ---------- */
+.montage{position:fixed;inset:0;z-index:85;background:#03050f;overflow:hidden}
+.m-stage{position:absolute;inset:0}
+.m-stage .shot{position:absolute;inset:0;opacity:0}
+.m-stage .shot img{width:100%;height:100%;object-fit:cover;filter:saturate(1.1) contrast(1.05)}
+.m-stage .shot::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,#03050fd0 100%),linear-gradient(180deg,transparent 50%,#03050fcc)}
+.m-text{position:absolute;left:0;right:0;bottom:16dvh;text-align:center;padding:0 var(--pad);z-index:2}
+.m-big{font-family:var(--display);font-weight:700;font-size:clamp(2rem,10vw,3.4rem);letter-spacing:.06em;color:#fff;text-shadow:0 0 30px #7fdcffaa,0 3px 14px #000}
+.m-sub{font-family:var(--script);font-size:clamp(2rem,10vw,3rem);color:var(--ice);margin-top:.2rem;text-shadow:0 2px 12px #000}
+.m-skip{position:absolute;top:max(16px,env(safe-area-inset-top));right:16px;z-index:3;background:#ffffff1f;color:#fff;border:1px solid #ffffff33;border-radius:999px;padding:.4rem 1rem;font:800 .7rem var(--body);letter-spacing:.15em;text-transform:uppercase}
+.m-flare{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(100deg,transparent 35%,#ffffff66 50%,transparent 65%);transform:translateX(-120%)}
+
+/* ---------- toy gifts ---------- */
+.gift-badge{position:absolute;left:0;top:0;width:30px;height:30px;margin:-15px 0 0 -15px;display:grid;place-items:center;font-size:20px;z-index:6;pointer-events:none;
+  filter:drop-shadow(0 0 8px #ffd98a);animation:giftpulse 1.4s ease-in-out infinite}
+.gift-badge.done{animation:none;opacity:.35;filter:none;font-size:14px}
+@keyframes giftpulse{50%{scale:1.25}}
+.gift-modal{position:fixed;inset:0;z-index:88;display:grid;place-items:center;padding:24px var(--pad);background:#03050faa;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.gift-card{width:min(100%,360px);text-align:center;padding:1.4rem 1.4rem 1.6rem;border-radius:28px;background:linear-gradient(160deg,#ffffff,#e6f6ff);color:#0b1638;box-shadow:0 0 0 1px #fff,0 0 60px #7fdcff88,0 30px 60px #000a}
+.gift-card img{height:130px;width:auto;margin:-80px auto .4rem;filter:drop-shadow(0 10px 14px #0005)}
+.gift-card .kicker{color:#2a56c8}
+.gift-text{font-family:var(--display);font-weight:600;font-size:1.2rem;line-height:1.4}
+.gift-count{font-size:.8rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.5;margin-top:.9rem}

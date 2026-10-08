@@ -6,6 +6,7 @@ const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAl
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const rand = (a, b) => a + Math.random() * (b - a);
 const DPR = Math.min(devicePixelRatio || 1, 2);
+const buzz = (ms = 12) => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
 const loadImg = src => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
 
 /* =========================================================
@@ -120,8 +121,9 @@ function idleToys(toys, big = false) {
       .to(t.el, { scaleY: 1, scaleX: 1, duration: .14 });
     gsap.to(t.el, { rotation: i % 2 ? 5 : -5, duration: rand(.9, 1.3), yoyo: true, repeat: -1, ease: "sine.inOut", delay: i * .2 });
     t.el.addEventListener("click", () => {
-      const r = t.el.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height * .3, 40, PARTY, 7);
+      const r = t.el.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height * .3, 40, PARTY, 7); buzz(18);
       gsap.timeline().to(t.el, { y: -120, rotation: "+=360", duration: .55, ease: "power2.out" }).to(t.el, { y: 0, duration: .45, ease: "bounce.out" });
+      if (!big) setTimeout(() => openGift(i), 650);
     });
   });
 }
@@ -153,6 +155,7 @@ function updateBanner(t) {
     d += ` Q${c.x},${c.y} ${b.x},${b.y}`; segs.push([a, c, b]);
   }
   $("#rope").setAttribute("d", d); $("#sticks").setAttribute("d", sticks);
+  hero.toys.forEach((toy, i) => { if (toy.badge) toy.badge.style.transform = `translate(${toy.cx + toy.el.offsetWidth * .32}px,${pts[i].hy + toy.el.offsetHeight * .62}px)`; });
   const N = BANNER.length, S = segs.length;
   hero.flags.forEach(f => {
     const u = (f.k + .5) / N * S, s = Math.min(S - 1, Math.floor(u)), lt = .1 + (u - s) * .8;
@@ -184,6 +187,7 @@ async function setupHero() {
     hero.toys = buildToys($("#heroToys"), toys, true);
     await Promise.all(hero.toys.map(t => t.el.decode().catch(() => {})));
     layoutToys(hero.toys, $("#heroToys")); buildFlags();
+    hero.toys.forEach(t => { t.badge = document.createElement("div"); t.badge.className = "gift-badge"; t.badge.textContent = "🎁"; $("#heroToys").appendChild(t.badge); });
     addEventListener("resize", () => layoutToys(hero.toys, $("#heroToys")));
     gsap.ticker.add(time => updateBanner(time));
   } else $(".bunting").style.display = "none";
@@ -213,6 +217,47 @@ function playHero() {
   gsap.to(".hero-title", { yPercent: -80, opacity: 0, ease: "none", scrollTrigger: out });
 }
 
+/* ---------- gifts ---------- */
+const opened5 = new Set();
+function openGift(i) {
+  const g = (C.gifts || [])[i]; if (!g) return;
+  opened5.add(i);
+  const toy = hero.toys[i]; if (toy && toy.badge) { toy.badge.classList.add("done"); toy.badge.textContent = "✓"; }
+  $("#giftToy").src = toy.el.src; $("#giftTitle").textContent = g.title; $("#giftText").textContent = g.text;
+  $("#giftCount").textContent = opened5.size === C.gifts.length ? "All gifts opened 💙" : `${opened5.size} of ${C.gifts.length} gifts opened`;
+  $("#giftModal").hidden = false;
+  gsap.fromTo("#giftCard", { scale: .3, rotation: -12, opacity: 0 }, { scale: 1, rotation: 0, opacity: 1, duration: .6, ease: "back.out(2)" });
+  gsap.fromTo("#giftToy", { y: 40, scale: .6 }, { y: 0, scale: 1, duration: .7, ease: "back.out(2.5)", delay: .1 });
+  burst(innerWidth / 2, innerHeight / 2, 70, PARTY, 9); buzz(25);
+  if (opened5.size === C.gifts.length) { setTimeout(() => { for (let k = 0; k < 6; k++) setTimeout(firework, k * 300); }, 500); $("#toyHint").textContent = "Scroll ↓ there's more"; }
+}
+const closeGift = () => gsap.to("#giftCard", { scale: .8, opacity: 0, duration: .25, onComplete: () => ($("#giftModal").hidden = true) });
+$("#giftClose").addEventListener("click", closeGift);
+$("#giftModal").addEventListener("click", e => { if (e.target.id === "giftModal") closeGift(); });
+
+/* ---------- opening film ---------- */
+async function playMontage() {
+  const M = C.montage || []; if (!M.length) return;
+  const stage = $("#mStage"); stage.innerHTML = M.map(m => `<div class="shot">${m.img ? `<img src="${m.img}" alt="">` : ""}</div>`).join("") + `<div class="m-flare"></div>`;
+  $("#montage").hidden = false;
+  let skip = false; const skipP = new Promise(r => $("#mSkip").addEventListener("click", () => { skip = true; r(); }, { once: true }));
+  const shots = $$("#mStage .shot");
+  for (let i = 0; i < M.length && !skip; i++) {
+    const s = shots[i], img = s.querySelector("img");
+    gsap.to(s, { opacity: 1, duration: .5 });
+    if (img) gsap.fromTo(img, { scale: 1.25, x: i % 2 ? -20 : 20 }, { scale: 1.05, x: 0, duration: 2.4, ease: "power1.out" });
+    gsap.fromTo(".m-flare", { xPercent: -120 }, { xPercent: 120, duration: .9, ease: "power2.inOut" });
+    $("#mBig").textContent = M[i].text || ""; $("#mSub").textContent = M[i].sub || "";
+    gsap.fromTo("#mBig", { opacity: 0, y: 20, letterSpacing: ".4em" }, { opacity: 1, y: 0, letterSpacing: ".06em", duration: .8, ease: "power3.out" });
+    gsap.fromTo("#mSub", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .8, delay: .35 });
+    burst(innerWidth / 2, innerHeight * .78, 14, ICE, 3);
+    await Promise.race([sleep(i === 0 ? 2300 : 1800), skipP]);
+    if (i < M.length - 1) gsap.to(s, { opacity: 0, duration: .6 });
+  }
+  await gsap.to("#flash", { opacity: 1, duration: .3 });
+  $("#montage").hidden = true;
+}
+
 /* =========================================================
    STORY CONTENT
    ========================================================= */
@@ -238,7 +283,7 @@ function chapterHTML(ch) {
 $("#chapters").innerHTML = C.chapters.map(chapterHTML).join("");
 $("#ending").innerHTML = chapterHTML({ ...C.ending, date: "Always" });
 $("#crystals").innerHTML = C.loves.items.map(it => `<div class="crystal" role="button" tabindex="0"><div class="f"><b>${it.icon}</b><span>${it.front}</span></div><div class="bk">${it.back}</div></div>`).join("");
-$$(".crystal").forEach(c => c.addEventListener("click", () => { c.classList.toggle("flip"); const r = c.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, 34, ICE, 6); }));
+$$(".crystal").forEach(c => c.addEventListener("click", () => { c.classList.toggle("flip"); buzz(); const r = c.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, 34, ICE, 6); }));
 
 function choreograph() {
   const pl = gsap.timeline({ scrollTrigger: { trigger: "#prologue", start: "top top", end: "bottom bottom", scrub: 1 } });
@@ -283,7 +328,7 @@ ScrollTrigger.create({ trigger: "#counter", start: "top 80%", once: true, onEnte
 
 /* letter */
 $("#seal").addEventListener("click", async () => {
-  const s = $("#seal"), r = s.getBoundingClientRect();
+  const s = $("#seal"), r = s.getBoundingClientRect(); buzz(30);
   burst(r.left + r.width / 2, r.top + r.height / 2, 60, GOLD.concat(ICE), 8);
   await gsap.to(s, { scale: 1.3, rotation: 25, opacity: 0, duration: .5, ease: "back.in(2)" });
   $(".seal-wrap").hidden = true; $("#paper").hidden = false; ScrollTrigger.refresh();
@@ -318,14 +363,25 @@ ScrollTrigger.create({ trigger: "#finale", start: "top 35%", once: true, onEnter
    ========================================================= */
 if (C.password) $("#pw").hidden = false;
 const ready = setupHero();
+(async () => {   // preload everything she'll see first, with a progress ring
+  const urls = [C.art.bg, C.art.princess, ...C.art.toys, C.art.palace, C.art.couple, C.art.ballroom, ...(C.montage || []).map(m => m.img).filter(Boolean)];
+  let n = 0; const arc = $("#loaderArc");
+  await Promise.all(urls.map(u => loadImg(u).then(() => { n++; arc.style.strokeDashoffset = 119.4 * (1 - n / urls.length); $("#loaderPct").textContent = Math.round(n / urls.length * 100) + "%"; })));
+  await ready;
+  gsap.to("#loader", { scale: 0, opacity: 0, duration: .35, onComplete: () => { $("#loader").hidden = true; $("#openBtn").hidden = false; gsap.from("#openBtn", { scale: .6, opacity: 0, duration: .5, ease: "back.out(2)" }); } });
+})();
+addEventListener("scroll", () => { const h = document.documentElement.scrollHeight - innerHeight; $("#progress").style.transform = `scaleX(${h > 0 ? scrollY / h : 0})`; }, { passive: true });
 $("#openBtn").addEventListener("click", async () => {
   if (C.password && $("#pw").value.trim().toLowerCase() !== C.password.toLowerCase()) { $("#pwErr").hidden = false; return; }
   const r = $("#openBtn").getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, 80, ICE, 9);
   if (window.DeviceOrientationEvent && DeviceOrientationEvent.requestPermission) DeviceOrientationEvent.requestPermission().catch(() => {});
   initMusic(); $("#musicBtn").hidden = false;
   await ready;
+  buzz(30);
   await gsap.to("#flash", { opacity: 1, duration: .35, ease: "power2.in" });
   $("#gate").style.display = "none"; opened = true;
+  gsap.to("#flash", { opacity: 0, duration: .6 });
+  await playMontage();
   gsap.to("#flash", { opacity: 0, duration: 1.2, ease: "power2.out" });
   playHero();
   setTimeout(() => { document.body.classList.remove("locked"); ScrollTrigger.refresh(); }, 2000);

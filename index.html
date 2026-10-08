@@ -22,10 +22,30 @@
   <h1 id="gateTitle">For Aashu</h1>
   <p class="gate-sub">Headphones on. Volume up a little.</p>
   <input id="pw" type="password" placeholder="secret word" autocomplete="off" hidden>
-  <button id="openBtn" class="btn">Begin the story</button>
+  <div class="loader" id="loader"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19"/><circle id="loaderArc" cx="22" cy="22" r="19"/></svg><span id="loaderPct">0%</span></div>
+  <button id="openBtn" class="btn" hidden>Begin the story</button>
   <p id="pwErr" class="err" hidden>Not quite. Try again ❄</p>
 </section>
 <div id="flash" aria-hidden="true"></div>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<!-- Opening film -->
+<div class="montage" id="montage" hidden>
+  <div class="m-stage" id="mStage"></div>
+  <div class="m-text"><p class="m-big" id="mBig"></p><p class="m-sub" id="mSub"></p></div>
+  <button class="m-skip" id="mSkip">Skip ▸</button>
+</div>
+
+<!-- Gift card -->
+<div class="gift-modal" id="giftModal" hidden>
+  <div class="gift-card" id="giftCard">
+    <img id="giftToy" alt="">
+    <p class="kicker" id="giftTitle"></p>
+    <p class="gift-text" id="giftText"></p>
+    <p class="gift-count" id="giftCount"></p>
+    <button class="btn sm" id="giftClose">Close 💙</button>
+  </div>
+</div>
 
 <button id="musicBtn" class="music-btn" aria-label="Music on or off" hidden><span class="eq"><i></i><i></i><i></i></span></button>
 <audio id="songAudio" loop preload="none"></audio>
@@ -43,7 +63,7 @@
       <p class="kicker" id="heroKicker"></p>
       <h1 class="script grad" id="heroName"></h1>
     </div>
-    <div class="scrollhint"><span>Scroll ↓</span></div>
+    <div class="scrollhint"><span id="toyHint">Tap a toy to open its gift 🎁</span></div>
     <div class="toys" id="heroToys" data-depth="34"><svg class="bunting" aria-hidden="true"><path id="sticks" class="sticks"/><path id="rope"/></svg><div id="flags"></div></div>
   </section>
 

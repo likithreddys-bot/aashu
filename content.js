@@ -26,30 +26,48 @@ window.CONTENT = {
   banner: "HAPPY BIRTHDAY",                 // letters on the flags the toys are holding
 
   prologue: [
-    "Once upon a time, in December 2024,",
+    "Once upon a time,",
     "a boy sent a girl one word: “undipothava?”",
-    "He didn't know it yet,",
-    "but that one word was the beginning of his whole story."
+    "She stayed. And that became his whole story."
+  ],
+
+  // the opening "film": real moments flash by right after the gate
+  montage: [
+    { text: "December 2024", sub: "“undipothava?”" },
+    { img: "assets/img/poster-her-window.jpg", text: "11 · 01 · 2025", sub: "the afternoon we said yes" },
+    { img: "assets/img/her-bike.jpg", text: "28 · 09 · 2025", sub: "finally, face to face" },
+    { img: "assets/img/us-selfie.jpg", text: "09 · 01 · 2026", sub: "again, and even better" },
+    { img: "assets/img/her-mirror.jpg", text: "always you" },
+    { img: "assets/img/poster-us-hearts.jpg", text: "and today…" }
+  ],
+
+  // tap a toy -> it opens a gift card (edit these freely)
+  gifts: [
+    { title: "From Teddy", text: "A promise: I'll always be your teddy bear. Soft when you need a hug, strong when you need someone." },
+    { title: "From Bunny", text: "December 2024. One word: “undipothava?” And you stayed. Best answer of my life." },
+    { title: "From Penguin", text: "28 September 2025. The first time I saw you for real. I'll never forget that moment." },
+    { title: "From Snowman", text: "9 January 2026. We met again, and it was the best thing that has ever happened to me." },
+    { title: "From Unicorn", text: "You fought for us when it was hard. Your strength is my favourite kind of magic." }
   ],
 
   chapters: [
     { n: "I", date: "December 2024", title: "The First Hello",
-      text: "It started with one message. Neither of us knew that one word would turn into everything.",
+      text: "One word. And it turned into everything.",
       chat: ["undipothava?"] },
     { n: "II", date: "11 January 2025 · afternoon", title: "The Afternoon We Said Yes",
-      text: "A normal afternoon, until it became the best day of my life. The day we became us.",
+      text: "A normal afternoon that became the best day of my life.",
       video: "assets/vid/her-window.mp4" },
     { n: "III", date: "28 September 2025", title: "Finally, Face to Face",
-      text: "Months of calls, and then there you were. The real you. Better than every time I had imagined you.",
+      text: "Months of calls, and then: you. Better than I ever imagined.",
       video: "assets/vid/her-bike.mp4" },
     { n: "IV", date: "9 January 2026", title: "Again, and Even Better",
-      text: "We met again. I'll say it simply: it's the best thing that has ever happened to me.",
+      text: "We met again. The best thing that has ever happened to me.",
       photo: "assets/img/us-selfie.jpg" }
   ],
 
   brave: {
     n: "V", title: "The Bravest Heart",
-    text: "It was not always easy. There were storms, and some days were heavy. But you chose us, you stood strong with a clear heart and a clear mind, and you never let go. Every princess story has a hero. In ours, it was you."
+    text: "There were storms. You chose us anyway, and you never let go. Every princess story has a hero. In ours, it was you."
   },
 
   loves: {
