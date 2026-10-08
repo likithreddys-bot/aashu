@@ -5,7 +5,7 @@
    ============================================================ */
 window.CONTENT = {
   name: "Aashu",
-  password: "",                        // e.g. "tangerine" adds a gate (client-side only, not real security)
+  password: "AASHLI",                  // gate word (not case-sensitive; client-side only, not real security)
   together: "2025-01-11T14:00:00",     // the afternoon you became a couple
   music: {
     local: "assets/audio/sing.mp3",    // you singing it (optional; used if present)
@@ -27,15 +27,15 @@ window.CONTENT = {
 
   prologue: [
     "Once upon a time, in December 2024,",
-    "a boy said a simple hi to a girl.",
+    "a boy sent a girl one word: “undipothava?”",
     "He didn't know it yet,",
-    "but that hi was the beginning of his whole story."
+    "but that one word was the beginning of his whole story."
   ],
 
   chapters: [
     { n: "I", date: "December 2024", title: "The First Hello",
-      text: "It started with one message. Neither of us knew that one conversation would turn into everything.",
-      chat: ["hi", "hello 🙂", "so what are you watching these days?", "k-dramas 😌"] },
+      text: "It started with one message. Neither of us knew that one word would turn into everything.",
+      chat: ["undipothava?"] },
     { n: "II", date: "11 January 2025 · afternoon", title: "The Afternoon We Said Yes",
       text: "A normal afternoon, until it became the best day of my life. The day we became us.",
       video: "assets/vid/her-window.mp4" },
@@ -81,6 +81,6 @@ window.CONTENT = {
 
   finale: {
     title: "Happy Birthday, Aashu",
-    surprise: "And your real surprise is waiting for you. Look up. 💙"
+    surprise: "And your real surprise? You'll see me very soon. 💙"
   }
 };
