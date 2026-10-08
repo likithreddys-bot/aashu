@@ -141,7 +141,7 @@ img,video{display:block;max-width:100%}
 .caret{display:inline-block;width:2px;height:1em;background:#14204a;vertical-align:middle;animation:bl 1s steps(1) infinite}
 @keyframes bl{50%{opacity:0}}
 
-.candle-glow{position:absolute;left:50%;top:44%;width:70vw;max-width:420px;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+.candle-glow{position:absolute;left:50%;top:57%;width:92vw;max-width:520px;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
   background:radial-gradient(circle,#fff3c4cc 0%,#ffd98a66 25%,#ffb04722 50%,transparent 70%);mix-blend-mode:screen;animation:flick .18s infinite alternate;pointer-events:none}
 @keyframes flick{to{opacity:.82;transform:translate(-50%,-50%) scale(1.04)}}
 .candle-glow.out{animation:none;opacity:0;transition:opacity .6s}

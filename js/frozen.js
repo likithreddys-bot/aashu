@@ -224,6 +224,7 @@ async function extinguish() {
   if (out) return; out = true;
   ["#blowBtn", "#tapBlow", "#blowHint"].forEach(s => ($(s).hidden = true));
   $("#glow").classList.add("out");
+  gsap.to("#ballroomImg", { filter: "brightness(.62) saturate(.85)", duration: .6, ease: "power2.out" });   // candles go out
   gsap.to("#wish", { opacity: 0, y: -20, duration: .5 });
   boost = 2.5;
   for (let i = 0; i < 14; i++) setTimeout(firework, 300 + i * 380);
